@@ -156,6 +156,7 @@ export default function JDDashboard() {
     // In a real app, you would use Next.js router to navigate
     window.location.href = `/job/${jobId}/edit`;
   };
+
   const fetchJobById = async (id: number): Promise<void> => {
     try {
       setLoading(true);

@@ -1,0 +1,128 @@
+'use client'
+
+import React, { useState, useEffect } from 'react';
+import RecruiterApp from './Recrutiers'; // Import the RecruiterApp component
+import JobRecruiterAssignment from './JobRecruiterAssignment'; // Import the new component
+import axios from 'axios';
+
+interface JobAssignment {
+  job_id: number;
+  recruiter_name: string;
+}
+
+const JobManagementDashboard: React.FC = () => {
+  const [showRecruiters, setShowRecruiters] = useState(false);
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
+  const [jobAssignments, setJobAssignments] = useState<Record<number, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const API_BASE_URL = "http://localhost:8000";
+
+  // Toggle the recruiters panel visibility
+  const toggleRecruitersPanel = () => {
+    setShowRecruiters(!showRecruiters);
+  };
+
+  // Open/close the assignment modal
+  const toggleAssignmentModal = () => {
+    setShowAssignmentModal(!showAssignmentModal);
+  };
+
+  // Fetch job-recruiter assignments
+  const fetchJobAssignments = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/job-recruiter-assignments`);
+      
+      // Transform data into a map of job_id -> recruiter_name
+      const assignmentsMap: Record<number, string> = {};
+      response.data.forEach((assignment: JobAssignment) => {
+        assignmentsMap[assignment.job_id] = assignment.recruiter_name;
+      });
+      
+      setJobAssignments(assignmentsMap);
+    } catch (error) {
+      console.error("Error fetching job assignments:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load assignments when component mounts
+  useEffect(() => {
+    fetchJobAssignments();
+  }, []);
+
+  // Callback for when an assignment is completed
+  const handleAssignmentComplete = () => {
+    fetchJobAssignments();
+  };
+
+  return (
+    <div className="dashboard-container">
+      {/* Header buttons */}
+      <div className="header-actions" style={{ display: 'flex', gap: '16px', margin: '20px 0' }}>
+        <button
+          className="primary-button"
+          onClick={toggleAssignmentModal}
+          style={{
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            padding: '10px 16px',
+            borderRadius: '4px',
+            border: 'none',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          <span className="icon">👥</span>
+          Assign New Team
+        </button>
+
+        <button
+          className="secondary-button"
+          onClick={toggleRecruitersPanel}
+          style={{
+            backgroundColor: showRecruiters ? '#e0e7ff' : 'white',
+            color: '#3b82f6',
+            padding: '10px 16px',
+            borderRadius: '4px',
+            border: '1px solid #3b82f6',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          <span className="icon">👤</span>
+          Manage Recruiters
+        </button>
+      </div>
+
+      {/* Conditional rendering of RecruiterApp */}
+      {showRecruiters && (
+        <div className="recruiters-panel" style={{ marginTop: '20px' }}>
+          <RecruiterApp />
+        </div>
+      )}
+
+      {/* Conditional rendering of JobRecruiterAssignment */}
+      {showAssignmentModal && (
+        <JobRecruiterAssignment 
+          onClose={toggleAssignmentModal}
+          onAssignmentComplete={handleAssignmentComplete}
+        />
+      )}
+
+      {/* Jobs table - this would be your existing content */}
+      <div>
+      </div>
+    </div>
+  );
+};
+
+export default JobManagementDashboard;
