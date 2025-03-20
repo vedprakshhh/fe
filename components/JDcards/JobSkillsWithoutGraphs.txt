@@ -1,0 +1,101 @@
+import React, { useState } from 'react';
+//@ts-ignore
+import { JobDescription } from '@/components/JDcards'; // Adjust the import path as needed
+
+interface JobDetailsCardProps {
+  job: JobDescription | null;
+  onClose: () => void;
+}
+
+const JobSkills: React.FC<JobDetailsCardProps> = ({ job, onClose }) => {
+  if (!job) return null;
+  
+  // Initialize state to store input values for required and preferred skills
+  const [requiredSkillInputs, setRequiredSkillInputs] = useState<{[key: string]: number}>(
+    job.required_skills?.reduce((acc, skill) => ({...acc, [skill]: 0}), {}) || {}
+  );
+  
+  const [preferredSkillInputs, setPreferredSkillInputs] = useState<{[key: string]: number}>(
+    job.preferred_skills?.reduce((acc, skill) => ({...acc, [skill]: 0}), {}) || {}
+  );
+  
+  // Handle input change for required skills
+  const handleRequiredSkillChange = (skill: string, value: number) => {
+    setRequiredSkillInputs(prev => ({...prev, [skill]: value}));
+  };
+  
+  // Handle input change for preferred skills
+  const handlePreferredSkillChange = (skill: string, value: number) => {
+    setPreferredSkillInputs(prev => ({...prev, [skill]: value}));
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-gray-800">{job.title}</h2>
+            <button 
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>            
+          {job.required_skills && job.required_skills.length > 0 && (
+            <div className="border-t border-gray-200 mt-4 pt-4">
+              <h3 className="text-lg font-semibold mb-2">Required Skills</h3>
+              <ul className="text-gray-700">
+                {job.required_skills.map((skill, index) => (
+                  <li key={index} className="flex items-center justify-between mb-2">
+                    <span className="mr-4">{skill}</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="10"
+                      value={requiredSkillInputs[skill] || 0}
+                      onChange={(e) => handleRequiredSkillChange(skill, Math.min(10, Math.max(0, parseInt(e.target.value) || 0)))}
+                      className="border border-gray-300 rounded px-3 py-1 w-20 text-center"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {job.preferred_skills && job.preferred_skills.length > 0 && (
+            <div className="border-t border-gray-200 mt-4 pt-4">
+              <h3 className="text-lg font-semibold mb-2">Preferred Skills</h3>
+              <ul className="text-gray-700">
+                {job.preferred_skills.map((skill, index) => (
+                  <li key={index} className="flex items-center justify-between mb-2">
+                    <span className="mr-4">{skill}</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="10"
+                      value={preferredSkillInputs[skill] || 0}
+                      onChange={(e) => handlePreferredSkillChange(skill, Math.min(10, Math.max(0, parseInt(e.target.value) || 0)))}
+                      className="border border-gray-300 rounded px-3 py-1 w-20 text-center"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={onClose}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default JobSkills;

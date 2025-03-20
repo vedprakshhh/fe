@@ -1,0 +1,36 @@
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+// Initialize the Inter font with Latin subset
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+// Define metadata for the application
+export const metadata: Metadata = {
+  title: 'My Application',
+  description: 'Created with Next.js',
+}
+
+// Root layout component that wraps all pages
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <header>
+          <nav>
+          </nav>
+        </header>
+        <main className="">
+          {children}
+        </main>
+      </body>
+    </html>
+  )
+}
