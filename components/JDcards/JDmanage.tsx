@@ -45,6 +45,11 @@ export default function JDDashboard() {
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const itemsPerPage: number = 5; // You can adjust this as needed
   const [showJobSkills, setShowJobSkills] = useState<boolean>(false);
+  const indexOfLastJob: number = currentPage * itemsPerPage;
+  const indexOfFirstJob: number = indexOfLastJob - itemsPerPage;
+  const currentJobs: JobDisplay[] = jobs.slice(indexOfFirstJob, indexOfLastJob);
+  const [selectedJob, setSelectedJob] = useState<JobDescription | null>(null);
+  const [showJobDetails, setShowJobDetails] = useState<boolean>(false);
 
   // API base URL - you might want to store this in an environment variable
   const API_BASE_URL = "http://localhost:8000";
@@ -189,11 +194,6 @@ export default function JDDashboard() {
     // In a real app, you would use Next.js router to navigate
     window.location.href = "/job/new";
   };
-  const indexOfLastJob: number = currentPage * itemsPerPage;
-  const indexOfFirstJob: number = indexOfLastJob - itemsPerPage;
-  const currentJobs: JobDisplay[] = jobs.slice(indexOfFirstJob, indexOfLastJob);
-  const [selectedJob, setSelectedJob] = useState<JobDescription | null>(null);
-  const [showJobDetails, setShowJobDetails] = useState<boolean>(false);
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 flex">
       {/* Main Content */}
@@ -270,7 +270,6 @@ export default function JDDashboard() {
                     <tr>
                       <th className="p-3 text-left">Check</th>
                       <th className="p-3 text-left">Role</th>
-                      <th className="p-3 text-left">Company</th>
                       <th className="p-3 text-left">Job ID</th>
                       <th className="p-3 text-left">Upload Date</th>
                       <th className="p-3 text-left">Status</th>
@@ -283,7 +282,6 @@ export default function JDDashboard() {
                       <tr key={job.id} className="border-t border-gray-200 hover:bg-gray-50 transition">
                         <td className="p-3"><input type="checkbox" /></td>
                         <td className="p-3 font-medium">{job.role}</td>
-                        <td className="p-3 text-gray-600">{job.company}</td>
                         <td className="p-3 text-gray-600">{job.id}</td>
                         <td className="p-3 text-gray-600">{job.date}</td>
                         <td
@@ -300,12 +298,6 @@ export default function JDDashboard() {
                           >
                             <Eye className="w-4 h-4" /> View
                           </button>
-                          <button 
-                            className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition flex items-center gap-1"
-                            onClick={() => handleEditJob(job.id)}
-                          >
-                            <Edit className="w-4 h-4" /> Edit
-                          </button>
                         </td>
                         <td className="p-3">
                         <button 
@@ -319,7 +311,6 @@ export default function JDDashboard() {
                     ))}
                   </tbody>
                 </table>
-                
                 {/* Pagination Controls */}
                 <div className="flex justify-between items-center mt-4">
                   <div className="flex items-center justify-center w-full">
